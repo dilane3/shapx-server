@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { config } from "dotenv";
 import FileRouter from "./routers/fileRouter.js";
+import ShapeRouter from "./routers/shapeRouter.js";
 import { migrations } from "./db/index.js";
 
 // Config
@@ -18,6 +19,7 @@ app.use(cors({ origin: "*" }));
 
 // Setting routers
 app.use("/files", FileRouter)
+app.use("/shapes", ShapeRouter)
 
 // Launch the app
 app.listen(PORT, async () => {
