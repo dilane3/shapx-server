@@ -38,9 +38,9 @@ export default class FileRepository {
 
   /**
    * THis function create a new file (drawing draft) into the database
-   * @param {*} id 
-   * @param {*} name 
-   * @returns 
+   * @param {*} id
+   * @param {*} name
+   * @returns
    */
   async create(id, name) {
     await connection.execute(
@@ -58,11 +58,28 @@ export default class FileRepository {
 
   /**
    * Returns the list of files with its shapes directly
-   * 
+   *
    * We are joining two tables here (files and shapes)
-   * @returns 
+   * @returns
    */
   async findAll() {
+    const [allFiles] = await connection.execute(`
+      SELECT *
+      FROM files
+    `);
+
+    const files = [];
+
+    allFiles.forEach((row) => {
+      const file = new File({
+        ...row,
+        id: row.file_id,
+      });
+
+      files.push(file);
+    });
+
+    // Get all shapes
     const [rows] = await connection.execute(
       `
         SELECT *, shapes.id AS shape_id
@@ -71,27 +88,18 @@ export default class FileRepository {
       `
     );
 
-    const files = [];
 
-    rows.forEach(row => {
-      const file = new File({
-        ...row,
-        id: row.file_id
-      });
+    rows.forEach((row) => {
       const shape = new Shape({
         ...row,
-        id: row.shape_id
-      })
+        id: row.shape_id,
+      });
 
       // Check if the file has already been added into the files list
-      const index = files.findIndex(f => f.id === file.id);
+      const index = files.findIndex((f) => f.id === row.file_id);
 
       if (index !== -1) {
         files[index].add(shape);
-      } else {
-        file.add(shape);
-
-        files.push(file);
       }
     });
 
@@ -100,25 +108,31 @@ export default class FileRepository {
 
   /**
    * This function delete a file
-   * @param {*} id 
+   * @param {*} id
    */
   async delete(id) {
-    await connection.execute(`
+    await connection.execute(
+      `
       DELETE FROM files 
       WHERE id = ?  
-    `, [id]);
+    `,
+      [id]
+    );
   }
 
   /**
    * This function update the name of a file
-   * @param {*} id 
-   * @param {*} name 
+   * @param {*} id
+   * @param {*} name
    */
   async update(id, name) {
-    await connection.execute(`
+    await connection.execute(
+      `
       UPDATE files 
       SET name = ?
       WHERE id = ?  
-    `, [name, id]);
+    `,
+      [name, id]
+    );
   }
 }
