@@ -1,4 +1,3 @@
-import FileRepository from "../repositories/fileRepository.js";
 import ShapeRepository from "../repositories/shapeRepository.js";
 
 export default class ShapeController {

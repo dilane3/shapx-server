@@ -74,6 +74,8 @@ export default class FileController {
       });
     }
 
+    console.log({ id, name })
+
     // Get repository
     const fileRepository = new FileRepository();
 
